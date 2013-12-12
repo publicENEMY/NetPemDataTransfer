@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfServer", "WpfServer\WpfServer.csproj", "{B5D0B089-F912-4ECF-9ABA-F33EDAFCE881}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "WpfClient\WpfClient.csproj", "{0523ECE7-11E4-402E-AAE2-8D9202B75000}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightClient", "SilverlightClient\SilverlightClient.csproj", "{A96CFA9A-3784-4F04-9D68-BF986677BB21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightClient.Web", "SilverlightClient.Web\SilverlightClient.Web.csproj", "{591013F3-F9B1-4018-9C02-50E062C09603}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5D0B089-F912-4ECF-9ABA-F33EDAFCE881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5D0B089-F912-4ECF-9ABA-F33EDAFCE881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5D0B089-F912-4ECF-9ABA-F33EDAFCE881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5D0B089-F912-4ECF-9ABA-F33EDAFCE881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0523ECE7-11E4-402E-AAE2-8D9202B75000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0523ECE7-11E4-402E-AAE2-8D9202B75000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0523ECE7-11E4-402E-AAE2-8D9202B75000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0523ECE7-11E4-402E-AAE2-8D9202B75000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A96CFA9A-3784-4F04-9D68-BF986677BB21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A96CFA9A-3784-4F04-9D68-BF986677BB21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A96CFA9A-3784-4F04-9D68-BF986677BB21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A96CFA9A-3784-4F04-9D68-BF986677BB21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{591013F3-F9B1-4018-9C02-50E062C09603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{591013F3-F9B1-4018-9C02-50E062C09603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{591013F3-F9B1-4018-9C02-50E062C09603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{591013F3-F9B1-4018-9C02-50E062C09603}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
