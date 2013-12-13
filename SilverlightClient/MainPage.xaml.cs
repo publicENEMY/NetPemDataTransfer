@@ -89,6 +89,9 @@ namespace SilverlightClient
 			{
 				CommandMessageSender.SendMessage("Give|Me|Data|1048576");	
 			}
+
+			//test 
+			InitializeWorkerConnection();
 		}
 
 		private IDuplexTypedMessageSender<byte[], byte[]>[] WorkerMessageSender = new IDuplexTypedMessageSender<byte[], byte[]>[256];
@@ -105,7 +108,7 @@ namespace SilverlightClient
 
 			// Create TCP based messaging.
 			IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
-			IDuplexOutputChannel aDuplexOutputChannel = aMessaging.CreateDuplexOutputChannel("127.0.0.1:4502");
+			IDuplexOutputChannel aDuplexOutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:4502/");
 
 			// Attach the duplex output channel to the message sender
 			// and be able to send messages and receive messages.
@@ -161,9 +164,68 @@ namespace SilverlightClient
 			//	CommandMessageSender.DetachDuplexOutputChannel();
 		}
 
-		private bool InitializeWorkerConnection(IPEndPoint iPEndPoint)
+		private IDuplexOutputChannel Worker4504OutputChannel;
+		private bool InitializeWorkerConnection()
 		{
-			throw new NotImplementedException();
+			// Create TCP messaging
+			IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
+			Worker4504OutputChannel = aMessaging.CreateDuplexOutputChannel("tcp://127.0.0.1:4504/");
+
+			// Subscribe to response messages.
+			Worker4504OutputChannel.ConnectionClosed += Worker4504OutputChannel_ConnectionClosed;
+			Worker4504OutputChannel.ConnectionOpened += Worker4504OutputChannel_ConnectionOpened;
+			Worker4504OutputChannel.ResponseMessageReceived += Worker4504OutputChannel_ResponseMessageReceived;
+
+			// Open connection and be able to send messages and receive response messages.
+			Worker4504OutputChannel.OpenConnection();
+			Log("Channel id : " + Worker4504OutputChannel.ChannelId);
+
+			// Send a message.
+			byte[] data = new byte[1048576]; // initialize 1MB data
+			//byte[] data = new byte[10]; // initialize 1MB data
+			Random random = new Random();
+			random.NextBytes(data);
+			Worker4504OutputChannel.SendMessage(data);
+			Log("Sent data length : " + data.Length);
+
+			// Close connection.
+			//Worker4504OutputChannel.CloseConnection();
+
+			return true;
+		}
+
+		void Worker4504OutputChannel_ResponseMessageReceived(object sender, DuplexChannelMessageEventArgs e)
+		{
+			Log("Received data length : " + (e.Message as byte[]).Length);
+			Log("ChannelId : " + e.ChannelId);
+
+			//string s = BitConverter.ToString(e.Message as byte[]);
+			//Log("Received : " + s);
+			//Log("Received : " + e.Message.ToString());
+			//Log("Received : " + BitConverter.ToString(e.Message as byte[]));
+			//Worker4504OutputChannel.SendMessage(e.Message);
+		}
+
+		void Worker4504OutputChannel_ConnectionOpened(object sender, DuplexChannelEventArgs e)
+		{
+			Log("Worker 4504 connected");
+			Log("ChannelId : " + e.ChannelId);
+			Log("ResponseReceiverId : " + e.ResponseReceiverId);
+			Log("SenderAddress : " + e.SenderAddress);
+
+			//send to server connection id
+			CommandMessageSender.SendMessage("ResponseReceiverId|Open|" + e.ResponseReceiverId + "|");	
+		}
+
+		void Worker4504OutputChannel_ConnectionClosed(object sender, DuplexChannelEventArgs e)
+		{
+			Log("Worker 4504 disconnected");
+			Log("ChannelId : " + e.ChannelId);
+			Log("ResponseReceiverId : " + e.ResponseReceiverId);
+			Log("SenderAddress : " + e.SenderAddress);
+
+			//notify server closed connection id
+			CommandMessageSender.SendMessage("ResponseReceiverId|Closed|" + e.ResponseReceiverId + "|");
 		}
 	}
 }

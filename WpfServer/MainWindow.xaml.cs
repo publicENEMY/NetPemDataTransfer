@@ -57,7 +57,8 @@ namespace WpfServer
 		private TcpPolicyServer myPolicyServer = new TcpPolicyServer();
 		private IDuplexStringMessageReceiver CommandReceiver;
 
-		private IDuplexTypedMessageReceiver<byte[],byte[]> Worker4504Receiver;
+		//private IDuplexTypedMessageReceiver<byte[],byte[]> Worker4504Receiver;
+		private IDuplexInputChannel Worker4504InputChannel;
 
 		public void StartServer()
 		{
@@ -86,27 +87,28 @@ namespace WpfServer
 
 		public void StartWorker4504Server()
 		{
-			// Create duplex message receiver.
-			// It can receive messages and also send back response messages.
-			IDuplexTypedMessagesFactory duplexTypedMessagesFactory = new DuplexTypedMessagesFactory();
-			Worker4504Receiver = duplexTypedMessagesFactory.CreateDuplexTypedMessageReceiver<byte[],byte[]>();
-			Worker4504Receiver.ResponseReceiverConnected += ClientConnected;
-			Worker4504Receiver.ResponseReceiverDisconnected += ClientDisconnected;
-			Worker4504Receiver.MessageReceived += Worker4504Received;
-
 			// Create TCP based messaging.
 			IMessagingSystemFactory aMessaging = new TcpMessagingSystemFactory();
-			IDuplexInputChannel aDuplexInputChannel = aMessaging.CreateDuplexInputChannel("tcp://127.0.0.1:4504");
+			Worker4504InputChannel = aMessaging.CreateDuplexInputChannel("tcp://127.0.0.1:4504");
+			Worker4504InputChannel.MessageReceived += Worker4504InputChannel_MessageReceived;
+			Worker4504InputChannel.ResponseReceiverConnected += ClientConnected;
+			Worker4504InputChannel.ResponseReceiverDisconnected += ClientDisconnected;
+			//Worker4504InputChannel.ResponseReceiverConnected += Worker4504InputChannel_ResponseReceiverConnected;
+			//Worker4504InputChannel.ResponseReceiverDisconnected += Worker4504InputChannel_ResponseReceiverDisconnected;
+			Worker4504InputChannel.StartListening();
 
-			// Attach the duplex input channel to the message receiver and start listening.
-			// Note: Duplex input channel can receive messages but also send messages back.
-			Worker4504Receiver.AttachDuplexInputChannel(aDuplexInputChannel);
 			Logger.Info("Worker server 4504 started");
-			
 		}
 
-		private void Worker4504Received(object sender, TypedRequestReceivedEventArgs<byte[]> e)
+		void Worker4504InputChannel_MessageReceived(object sender, DuplexChannelMessageEventArgs e)
 		{
+			// echo back
+			//Logger.Info(BitConverter.ToString(e.Message as byte[]));
+			//string s = BitConverter.ToString(e.Message as byte[]);
+			//Logger.Info("Received : " + s);
+			Logger.Info("Received data length : " + (e.Message as byte[]).Length);
+			//Logger.Info(e.Message.ToString());
+			Worker4504InputChannel.SendResponseMessage(e.ResponseReceiverId, e.Message);
 		}
 
 		public void StopServer()
@@ -115,7 +117,7 @@ namespace WpfServer
 			// Note: If the listening is not closed, then listening threads are not ended
 			//       and the application would not be closed properly.
 			CommandReceiver.DetachDuplexInputChannel();
-			Worker4504Receiver.DetachDuplexInputChannel();
+			Worker4504InputChannel.StopListening();
 
 			myPolicyServer.StopPolicyServer();
 		}
@@ -126,6 +128,8 @@ namespace WpfServer
 			Logger.Info("Received : " + e.RequestMessage);
 
 			// Analyze message
+				// split strings
+				// receiving responsereceiverid from client
 			// Calculate mtu
 			// Warm up stopwatch
 			// Send message
@@ -146,7 +150,8 @@ namespace WpfServer
 			{
 				ConnectedClientsListBox.Items.Add(e.ResponseReceiverId);
 			});
-			Logger.Info("Connected : " + e.ResponseReceiverId);
+			Logger.Info("ResponseReceiverId : " + e.ResponseReceiverId);
+			Logger.Info("SenderAddress : " + e.SenderAddress);
 		}
 
 		// The method is called when a client is disconnected.
@@ -158,7 +163,8 @@ namespace WpfServer
 			{
 				ConnectedClientsListBox.Items.Remove(e.ResponseReceiverId);
 			});
-			Logger.Info("Disconnected : " + e.ResponseReceiverId);
+			Logger.Info("ResponseReceiverId : " + e.ResponseReceiverId);
+			Logger.Info("SenderAddress : " + e.SenderAddress);
 		}
 
 		private void BroadcastMessage(string s)
